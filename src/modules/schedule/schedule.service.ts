@@ -70,6 +70,7 @@ export class ScheduleService {
         eventTypeId: data.eventTypeId,
         baseUrl: data.scheduleBaseUrl,
         scheduleBaseUrl: data.scheduleBaseUrl,
+        scheduleApiKey: data.scheduleApiKey,
       });
 
       const nextHours = this.nextHours(slots, startTime);
