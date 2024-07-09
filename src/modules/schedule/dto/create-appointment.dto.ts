@@ -1,28 +1,20 @@
-export type AvailableHoursParams = {
-  startTime: string;
-  endTime: string;
-  eventTypeId: string;
-  baseUrl: string;
-  apiKey: string;
-};
-
-type Location = {
+class LocationDto {
   value: string;
   optionValue?: string;
-};
+}
 
-type Responses = {
+class ResponsesDto {
   name: string;
   email: string;
-  location: Location;
+  location: LocationDto;
   notes?: string;
   guests: any[];
-};
+}
 
-export type AppointmentData = {
+export class CreateAppointmentDto {
   baseUrl: string;
   apiKey: string;
-  responses: Responses;
+  responses: ResponsesDto;
   user: string;
   start: string;
   eventTypeId: number;
@@ -31,4 +23,4 @@ export type AppointmentData = {
   language: string;
   metadata: Record<string, any>;
   hasHashedBookingLink: boolean;
-};
+}

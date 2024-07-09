@@ -17,19 +17,94 @@ export interface SlotsResponse {
   slots: Slots;
 }
 
-// private async getAvailableHours(data: { startTime: string, endTime: string, eventTypeId: string, apiKey: string, baseUrl: string }) {
-//   const url = `https://${data.baseUrl}/v1/slots?apiKey=${data.apiKey}&startTime=${data.startTime}&endTime=${data.endTime}&eventTypeId=${data.eventTypeId}`;
-//   console.log(url)
-//   const response = await fetch(url, {
-//     method: 'GET',
-//     headers: {
-//       'Content-Type': 'application/json'
-//     }
-//   });
+type Location = {
+  value: string;
+  optionValue: string;
+};
 
-//   if (!response.ok) {
-//     throw new Error(`HTTP error! status: ${response.status}`);
-//   }
+type User = {
+  email: string | null;
+  name: string;
+  timeZone: string;
+  username: string;
+};
 
-//   return await response.json();
-// }
+type Reference = {
+  type: string;
+  uid: string;
+  thirdPartyRecurringEventId: string | null;
+  meetingId: string;
+  meetingPassword: string;
+  meetingUrl: string;
+  externalCalendarId: string;
+  credentialId: number;
+};
+
+type AppStatus = {
+  appName: string;
+  type: string;
+  success: number;
+  failures: number;
+  errors: string[];
+  warnings: string[];
+};
+
+type Responses = {
+  name: string;
+  email: string;
+  notes: string;
+  guests: any[];
+  location: Location;
+};
+
+export type AppointmentDataResponse = {
+  id: number;
+  uid: string;
+  idempotencyKey: string;
+  userId: number;
+  userPrimaryEmail: string;
+  eventTypeId: number;
+  title: string;
+  description: string;
+  customInputs: Record<string, any>;
+  responses: Responses;
+  startTime: string;
+  endTime: string;
+  location: string;
+  createdAt: string;
+  updatedAt: string | null;
+  status: string;
+  paid: boolean;
+  destinationCalendarId: number;
+  cancellationReason: string | null;
+  rejectionReason: string | null;
+  dynamicEventSlugRef: string | null;
+  dynamicGroupSlugRef: string | null;
+  rescheduled: string | null;
+  fromReschedule: string | null;
+  recurringEventId: string | null;
+  smsReminderNumber: string | null;
+  scheduledJobs: any[];
+  metadata: Record<string, any>;
+  isRecorded: boolean;
+  iCalUID: string;
+  iCalSequence: number;
+  rating: number | null;
+  ratingFeedback: string | null;
+  noShowHost: boolean | null;
+  user: User;
+  attendees: {
+    id: number;
+    email: string;
+    name: string;
+    timeZone: string;
+    locale: string;
+    bookingId: number;
+    noShow: boolean;
+  }[];
+  payment: any[];
+  references: Reference[];
+  appsStatus: AppStatus[];
+  paymentRequired: boolean;
+  luckyUsers: any[];
+};

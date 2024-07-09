@@ -19,7 +19,7 @@ export class SendFreeTimeDto {
 
   @IsString()
   @IsNotEmpty()
-  apiKey: string;
+  messageApiKey: string;
 
   @IsString()
   @IsNotEmpty()

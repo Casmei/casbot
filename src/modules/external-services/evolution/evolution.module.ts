@@ -5,21 +5,8 @@ export interface ApiConfig {
   apiKey: string;
 }
 
-@Module({})
-export class EvolutionModule {
-  static registerAsync(options: {
-    useFactory: () => Promise<ApiConfig> | ApiConfig;
-  }): DynamicModule {
-    return {
-      module: EvolutionModule,
-      providers: [
-        {
-          provide: 'API_CONFIG',
-          useFactory: options.useFactory,
-        },
-        EvolutionService,
-      ],
-      exports: [EvolutionService],
-    };
-  }
-}
+@Module({
+  providers: [EvolutionService],
+  exports: [EvolutionService],
+})
+export class EvolutionModule {}

@@ -28,5 +28,6 @@ export type RowListMessage = {
 export type SendPlainTextData = {
   instance: string;
   baseUrl: string;
+  apiKey: string;
   data: ListMessage;
 };

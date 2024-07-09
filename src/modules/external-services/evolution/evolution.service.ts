@@ -1,14 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SendPlainTextData } from './types/request.type';
-import { ApiConfig } from '../cal/cal.module';
 
 @Injectable()
 export class EvolutionService {
-  constructor(@Inject('API_CONFIG') private readonly apiConfig: ApiConfig) {}
-
   async sendMessage({
     baseUrl,
     data,
+    apiKey,
     instance,
   }: SendPlainTextData): Promise<any> {
     const endpoint = `https://${baseUrl}/message/sendList/${instance}`;
@@ -16,7 +14,7 @@ export class EvolutionService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        apiKey: this.apiConfig.apiKey,
+        apiKey,
       },
       body: JSON.stringify(data),
     });

@@ -5,21 +5,8 @@ export interface ApiConfig {
   apiKey: string;
 }
 
-@Module({})
-export class CalModule {
-  static registerAsync(options: {
-    useFactory: () => Promise<ApiConfig> | ApiConfig;
-  }): DynamicModule {
-    return {
-      module: CalModule,
-      providers: [
-        {
-          provide: 'API_CONFIG',
-          useFactory: options.useFactory,
-        },
-        CalService,
-      ],
-      exports: [CalService],
-    };
-  }
-}
+@Module({
+  providers: [CalService],
+  exports: [CalService],
+})
+export class CalModule {}

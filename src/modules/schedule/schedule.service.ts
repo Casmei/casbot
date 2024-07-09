@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CalService } from '../external-services/cal/cal.service';
 import * as moment from 'moment';
-import { SlotsResponse } from '../external-services/cal/types/request.types';
 import { daysOfWeek, monthsInPortuguese } from './data';
 import { EvolutionService } from '../external-services/evolution/evolution.service';
 import {
@@ -9,12 +8,16 @@ import {
   RowListMessage,
 } from '../external-services/evolution/types/request.type';
 import { SendFreeTimeDto } from './dto/send-free-days.dto';
+import { SendFreeHoursDto } from './dto/send-free-hours.dto';
+import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { SlotsResponse } from '../external-services/cal/types/response.types';
 
 export type sendFreeDaysTypes = {
   startTime: string;
   endTime: string;
   eventTypeId: string;
   scheduleBaseUrl: string;
+  scheduleApiKey: string;
   baseUrl: string;
   number: string;
   instance: string;
@@ -24,18 +27,20 @@ export type sendFreeDaysTypes = {
 export class ScheduleService {
   constructor(
     private readonly scheduleApi: CalService,
-    private readonly evolutionService: EvolutionService,
+    private readonly evolutionApi: EvolutionService,
   ) {}
 
   async sendFreeDays(data: SendFreeTimeDto, instance: string) {
     try {
       const { startTime, endTime } = this.calculateDates(7);
+
       const slots = await this.getFreeHours({
         startTime,
         endTime,
         eventTypeId: data.eventTypeId,
         baseUrl: data.scheduleBaseUrl,
         scheduleBaseUrl: data.scheduleBaseUrl,
+        scheduleApiKey: data.scheduleApiKey,
       });
 
       const nextSixDays = this.nextSixDays(slots);
@@ -45,7 +50,8 @@ export class ScheduleService {
         nextSixDays,
       );
 
-      await this.evolutionService.sendMessage({
+      await this.evolutionApi.sendMessage({
+        apiKey: data.messageApiKey,
         baseUrl: data.baseUrl,
         instance: instance,
         data: createListMessage,
@@ -55,7 +61,7 @@ export class ScheduleService {
     }
   }
 
-  async sendFreeHours(data: SendFreeTimeDto, instance: string) {
+  async sendFreeHours(data: SendFreeHoursDto, instance: string) {
     try {
       const { startTime, endTime } = this.calculateDates(1, data.startTime);
       const slots = await this.getFreeHours({
@@ -73,7 +79,8 @@ export class ScheduleService {
         nextHours,
       );
 
-      await this.evolutionService.sendMessage({
+      await this.evolutionApi.sendMessage({
+        apiKey: data.messageApiKey,
         baseUrl: data.baseUrl,
         instance: instance,
         data: createHourListMessage,
@@ -83,12 +90,23 @@ export class ScheduleService {
     }
   }
 
+  async createAppointment(data: CreateAppointmentDto) {
+    try {
+      await this.scheduleApi.makeAppointment(data);
+      return true;
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
   calculateDates(
     addDay: number,
-    startTime?: string,
+    startTime: string | Date = new Date(),
   ): { startTime: string; endTime: string } {
     const start = new Date(startTime);
     const end = new Date(start);
+
+    console.log(start, end);
 
     end.setDate(start.getDate() + addDay);
 
@@ -100,6 +118,7 @@ export class ScheduleService {
 
   private async getFreeHours(data: Partial<sendFreeDaysTypes>) {
     return this.scheduleApi.getScheduleSlots({
+      apiKey: data.scheduleApiKey,
       startTime: data.startTime,
       endTime: data.endTime,
       eventTypeId: data.eventTypeId,
@@ -132,7 +151,7 @@ export class ScheduleService {
     const data: RowListMessage[] = [];
     console.log(startTime, slots);
 
-    slots[startTime].forEach((slot, index) => {
+    slots[startTime].forEach((slot) => {
       const date = new Date(slot.time);
       const formatedHour = moment(date).format('HH:mm');
 
@@ -140,7 +159,7 @@ export class ScheduleService {
 
       data.push({
         title,
-        rowId: (index + 1).toString(),
+        rowId: slot.time,
       });
     });
 
