@@ -33,7 +33,6 @@ export class ScheduleController {
 
   @Post('appointment')
   createAppointment(@Body() createAppointmentDto: CreateAppointmentDto) {
-    console.log(createAppointmentDto);
     this.scheduleService.createAppointment(createAppointmentDto);
   }
 }

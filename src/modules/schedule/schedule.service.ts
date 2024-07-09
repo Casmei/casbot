@@ -106,8 +106,6 @@ export class ScheduleService {
     const start = new Date(startTime);
     const end = new Date(start);
 
-    console.log(start, end);
-
     end.setDate(start.getDate() + addDay);
 
     return {
@@ -149,7 +147,6 @@ export class ScheduleService {
     startTime: string,
   ): RowListMessage[] {
     const data: RowListMessage[] = [];
-    console.log(startTime, slots);
 
     slots[startTime].forEach((slot) => {
       const date = new Date(slot.time);
