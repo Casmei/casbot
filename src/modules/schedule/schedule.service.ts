@@ -8,7 +8,7 @@ import {
   ListMessage,
   RowListMessage,
 } from '../external-services/evolution/types/request.type';
-import { SendFreeDaysDto } from './dto/send-free-days.dto';
+import { SendFreeTimeDto } from './dto/send-free-days.dto';
 
 export type sendFreeDaysTypes = {
   startTime: string;
@@ -27,9 +27,9 @@ export class ScheduleService {
     private readonly evolutionService: EvolutionService,
   ) {}
 
-  async sendFreeDays(data: SendFreeDaysDto, instance: string) {
+  async sendFreeDays(data: SendFreeTimeDto, instance: string) {
     try {
-      const { startTime, endTime } = this.calculateDates();
+      const { startTime, endTime } = this.calculateDates(7);
       const slots = await this.getFreeHours({
         startTime,
         endTime,
@@ -40,7 +40,7 @@ export class ScheduleService {
 
       const nextSixDays = this.nextSixDays(slots);
 
-      const createListMessage = this.createListMessage(
+      const createListMessage = this.createDayListMessage(
         data.number,
         nextSixDays,
       );
@@ -50,22 +50,51 @@ export class ScheduleService {
         instance: instance,
         data: createListMessage,
       });
-
-      return nextSixDays;
     } catch (error) {
       console.error('Error:', error);
     }
   }
 
-  calculateDates(): { startTime: string; endTime: string } {
-    const startTime = new Date();
-    const endTime = new Date(startTime);
+  async sendFreeHours(data: SendFreeTimeDto, instance: string) {
+    try {
+      const { startTime, endTime } = this.calculateDates(1, data.startTime);
+      const slots = await this.getFreeHours({
+        startTime,
+        endTime,
+        eventTypeId: data.eventTypeId,
+        baseUrl: data.scheduleBaseUrl,
+        scheduleBaseUrl: data.scheduleBaseUrl,
+      });
 
-    endTime.setDate(startTime.getDate() + 7);
+      const nextHours = this.nextHours(slots, startTime);
+
+      const createHourListMessage = this.createHourListMessage(
+        data.number,
+        nextHours,
+      );
+
+      await this.evolutionService.sendMessage({
+        baseUrl: data.baseUrl,
+        instance: instance,
+        data: createHourListMessage,
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  calculateDates(
+    addDay: number,
+    startTime?: string,
+  ): { startTime: string; endTime: string } {
+    const start = new Date(startTime);
+    const end = new Date(start);
+
+    end.setDate(start.getDate() + addDay);
 
     return {
-      startTime: startTime.toISOString().slice(0, 10),
-      endTime: endTime.toISOString().slice(0, 10),
+      startTime: start.toISOString().slice(0, 10),
+      endTime: end.toISOString().slice(0, 10),
     };
   }
 
@@ -96,7 +125,29 @@ export class ScheduleService {
     return data;
   }
 
-  private createListMessage(
+  private nextHours(
+    { slots }: SlotsResponse,
+    startTime: string,
+  ): RowListMessage[] {
+    const data: RowListMessage[] = [];
+    console.log(startTime, slots);
+
+    slots[startTime].forEach((slot, index) => {
+      const date = new Date(slot.time);
+      const formatedHour = moment(date).format('HH:mm');
+
+      const title = formatedHour;
+
+      data.push({
+        title,
+        rowId: (index + 1).toString(),
+      });
+    });
+
+    return data;
+  }
+
+  private createDayListMessage(
     number: string,
     nextSixDays: RowListMessage[],
   ): ListMessage {
@@ -121,6 +172,38 @@ export class ScheduleService {
                 rowId: '0',
               },
               ...nextSixDays,
+            ],
+          },
+        ],
+      },
+    };
+  }
+
+  private createHourListMessage(
+    number: string,
+    hoursList: RowListMessage[],
+  ): ListMessage {
+    return {
+      number,
+      options: {
+        delay: 4000,
+        presence: 'composing',
+      },
+      listMessage: {
+        title: '🕑 *Selecione a hora desejada*',
+        description:
+          'Agora só falta escolher um horário 👇🏼\n\nCaso necessário envie *Voltar*',
+        buttonText: 'Ver opções',
+        sections: [
+          {
+            title: 'Horários disponíveis',
+            rows: [
+              {
+                title: 'Recomeçar',
+                description: 'Voltar para a primeira opção',
+                rowId: '0',
+              },
+              ...hoursList,
             ],
           },
         ],

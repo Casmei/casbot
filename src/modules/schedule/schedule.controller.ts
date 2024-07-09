@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
-import { SendFreeDaysDto } from './dto/send-free-days.dto';
+import { SendFreeTimeDto } from './dto/send-free-days.dto';
 
 export type DataType = {
   apiKey: string;
@@ -15,9 +15,17 @@ export class ScheduleController {
 
   @Post('send-free-days/:instance')
   sendFreeDays(
-    @Body() sendFreeDaysDto: SendFreeDaysDto,
+    @Body() sendFreeDaysDto: SendFreeTimeDto,
     @Param('instance') instance: string,
   ) {
-    return this.scheduleService.sendFreeDays(sendFreeDaysDto, instance);
+    this.scheduleService.sendFreeDays(sendFreeDaysDto, instance);
+  }
+
+  @Post('send-free-hours/:instance')
+  sendFreeHours(
+    @Body() sendFreeDaysDto: SendFreeTimeDto,
+    @Param('instance') instance: string,
+  ) {
+    this.scheduleService.sendFreeHours(sendFreeDaysDto, instance);
   }
 }

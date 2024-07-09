@@ -1,6 +1,6 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
-export class SendFreeDaysDto {
+export class SendFreeTimeDto {
   @IsString()
   @IsNotEmpty()
   scheduleBaseUrl: string;
@@ -24,4 +24,12 @@ export class SendFreeDaysDto {
   @IsString()
   @IsNotEmpty()
   number: string;
+
+  @IsString()
+  @IsOptional()
+  startTime: string;
+
+  @IsString()
+  @IsOptional()
+  endTime: string;
 }
