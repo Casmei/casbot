@@ -24,6 +24,7 @@ export class CalService implements ScheduleApiInterface {
     data: AppointmentData,
   ): Promise<AppointmentDataResponse> {
     try {
+      data.eventTypeId = Number(data.eventTypeId)
       const url = `https://${data.baseUrl}/v1/bookings?apiKey=${data.apiKey}`;
       const response = await fetch(url, {
         method: 'POST',

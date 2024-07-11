@@ -25,7 +25,7 @@ export type AppointmentData = {
   responses: Responses;
   user: string;
   start: string;
-  eventTypeId: number;
+  eventTypeId: string | number;
   eventTypeSlug: string;
   timeZone: string;
   language: string;

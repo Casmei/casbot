@@ -17,7 +17,7 @@ export class CreateAppointmentDto {
   responses: ResponsesDto;
   user: string;
   start: string;
-  eventTypeId: number;
+  eventTypeId: string;
   eventTypeSlug: string;
   timeZone: string;
   language: string;
