@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CalService } from '../external-services/cal/cal.service';
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { daysOfWeek, monthsInPortuguese } from './data';
 import { EvolutionService } from '../external-services/evolution/evolution.service';
 import {
@@ -150,13 +150,10 @@ export class ScheduleService {
     const data: RowListMessage[] = [];
 
     slots[startTime].forEach((slot) => {
-      const date = new Date(slot.time);
-      const formatedHour = moment(date).format('HH:mm');
-
-      const title = formatedHour;
+      const formatedHour = moment(slot.time).tz('America/Sao_Paulo').format('HH:mm');
 
       data.push({
-        title,
+        title: formatedHour,
         rowId: slot.time,
       });
     });
