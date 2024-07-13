@@ -19,15 +19,33 @@ export type ListMessage = {
   };
 };
 
+export type PlainMessage = {
+  number: string;
+  options: {
+    delay: number;
+    presence: string;
+  };
+  textMessage: {
+    text: string;
+  };
+};
+
 export type RowListMessage = {
   title: string;
   description?: string;
   rowId: string;
 };
 
-export type SendPlainTextData = {
+export type SendListTextData = {
   instance: string;
   baseUrl: string;
   apiKey: string;
   data: ListMessage;
+};
+
+export type SendPlainTextData = {
+  instance: string;
+  baseUrl: string;
+  apiKey: string;
+  data: PlainMessage;
 };

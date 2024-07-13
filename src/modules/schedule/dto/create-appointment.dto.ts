@@ -13,6 +13,10 @@ class ResponsesDto {
 
 export class CreateAppointmentDto {
   baseUrl: string;
+  messageApiKey: string;
+  messageBaseUrl: string;
+  message: string;
+  number: string;
   apiKey: string;
   responses: ResponsesDto;
   user: string;

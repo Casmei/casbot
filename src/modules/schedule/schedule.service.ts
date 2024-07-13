@@ -50,7 +50,7 @@ export class ScheduleService {
         nextSixDays,
       );
 
-      await this.evolutionApi.sendMessage({
+      await this.evolutionApi.sendList({
         apiKey: data.messageApiKey,
         baseUrl: data.baseUrl,
         instance: instance,
@@ -80,7 +80,7 @@ export class ScheduleService {
         nextHours,
       );
 
-      await this.evolutionApi.sendMessage({
+      await this.evolutionApi.sendList({
         apiKey: data.messageApiKey,
         baseUrl: data.baseUrl,
         instance: instance,
@@ -91,9 +91,37 @@ export class ScheduleService {
     }
   }
 
-  async createAppointment(data: CreateAppointmentDto) {
+  async createAppointment(data: CreateAppointmentDto, instance: string) {
     try {
       await this.scheduleApi.makeAppointment(data);
+
+      const dt = new Date(data.start);
+
+      dt.setHours(dt.getHours() - 3);
+
+      const day = String(dt.getDate()).padStart(2, '0');
+      const month = String(dt.getMonth() + 1).padStart(2, '0');
+      const hour = String(dt.getHours()).padStart(2, '0');
+      const minute = String(dt.getMinutes()).padStart(2, '0');
+      const formatedDate = `${day}/${month} às ${hour}:${minute}`;
+
+      const message = {
+        text: data.message.replace(/!data/, formatedDate),
+      };
+
+      await this.evolutionApi.sendPlainMessage({
+        apiKey: data.messageApiKey,
+        baseUrl: data.messageBaseUrl,
+        instance: instance,
+        data: {
+          number: data.number,
+          options: {
+            delay: 1200,
+            presence: 'composing',
+          },
+          textMessage: message,
+        },
+      });
       return true;
     } catch (error) {
       console.error('Error:', error);
@@ -150,7 +178,9 @@ export class ScheduleService {
     const data: RowListMessage[] = [];
 
     slots[startTime].forEach((slot) => {
-      const formatedHour = moment(slot.time).tz('America/Sao_Paulo').format('HH:mm');
+      const formatedHour = moment(slot.time)
+        .tz('America/Sao_Paulo')
+        .format('HH:mm');
 
       data.push({
         title: formatedHour,

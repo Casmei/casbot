@@ -31,8 +31,11 @@ export class ScheduleController {
     return this.scheduleService.sendFreeHours(sendFreeDaysDto, instance);
   }
 
-  @Post('appointment')
-  createAppointment(@Body() createAppointmentDto: CreateAppointmentDto) {
-    this.scheduleService.createAppointment(createAppointmentDto);
+  @Post('appointment/:instance')
+  createAppointment(
+    @Body() createAppointmentDto: CreateAppointmentDto,
+    @Param('instance') instance: string,
+  ) {
+    this.scheduleService.createAppointment(createAppointmentDto, instance);
   }
 }
